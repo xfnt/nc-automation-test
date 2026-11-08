@@ -21,6 +21,55 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+val withDocker = providers.gradleProperty("withDocker")
+    .map(String::toBoolean)
+    .getOrElse(false)
+
+val composeFile = layout.projectDirectory.file(
+    "docker/docker-compose.yml"
+)
+
+val composeProject = "nc-automation-tests"
+
+val dockerDown = tasks.register<Exec>("dockerDown") {
+    group = "docker"
+    description = "Stop Docker Compose and remove resources"
+
+    commandLine(
+        "docker", "compose",
+        "-p", composeProject,
+        "-f", composeFile.asFile.absolutePath,
+        "down",
+        "--volumes",
+        "--remove-orphans",
+        "--rmi", "local"
+    )
+}
+
+val dockerUp = tasks.register<Exec>("dockerUp") {
+    group = "docker"
+    description = "Start Docker Compose and wait for readiness"
+
+    commandLine(
+        "docker", "compose",
+        "-p", composeProject,
+        "-f", composeFile.asFile.absolutePath,
+        "up",
+        "--build",
+        "--wait",
+        "--wait-timeout", "120"
+    )
+
+    finalizedBy(dockerDown)
+}
+
 tasks.test {
     useJUnitPlatform()
+
+    outputs.upToDateWhen { false }
+
+    if (withDocker) {
+        dependsOn(dockerUp)
+        finalizedBy(dockerDown)
+    }
 }
