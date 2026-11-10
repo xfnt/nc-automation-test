@@ -6,8 +6,7 @@ public abstract class TokenGenerator {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final String NUMERIC = "0123456789";
-//    private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String UPPERCASE = "ABCDEF";
+    private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     // According to the task requirements, the token must follow this pattern: [A-Z0-9]{32}.
     public static String generateSuccessfulToken() {
