@@ -1,5 +1,5 @@
 
 Run test with docker startup
 ```
-./gradlew test -PwithDocker=false
+./gradlew test -PwithDocker=true
 ```
